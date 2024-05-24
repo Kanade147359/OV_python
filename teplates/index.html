@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Optimal Velocity Model</title>
+  <style>
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      border: 1px solid black;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+  </style>
+</head>
+<body>
+<h1>Optimal Velocity Model</h1>
+<h2>Simulator</h2>
+<table id="simulationTable">
+  <thead>
+    <tr>
+      <th>Car Index</th>
+      <th>Position (x)</th>
+      <th>Velocity (v)</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for i in range(number_of_cars) %}
+    <tr>
+      <td>{{ i }}</td>
+      <td id="pos-{{ i }}"></td>
+      <td id="vel-{{ i }}"></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<div>
+  <button onclick="restart()">Restart</button>
+</div>
+
+<script>
+  function restart() {
+    fetch('/step').then(response => response.json()).then(data => {
+      updateTable(data);
+    });
+  }
+
+  function updateTable(data) {
+    for (let i = 0; i < data.cars_x.length; i++) {
+      document.getElementById('pos-' + i).innerText = data.cars_x[i].toFixed(2);
+      document.getElementById('vel-' + i).innerText = data.cars_v[i].toFixed(2);
+    }
+  }
+
+  function autoUpdate() {
+    restart();
+    setTimeout(autoUpdate, 1000); // Update every second
+  }
+
+  window.onload = function () {
+    autoUpdate();
+  }
+</script>
+</body>
+</html>
+
